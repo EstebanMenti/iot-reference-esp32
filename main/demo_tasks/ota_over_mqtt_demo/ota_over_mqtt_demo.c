@@ -389,6 +389,43 @@ static bool prvMatchClientIdentifierInTopic( const char * pTopic,
     return isMatch;
 }
 
+char *getAgentEventString( OtaEvent_t eventId )
+{
+    switch( eventId )
+    {
+         case OtaAgentEventStart:
+            return "OtaAgentEventStart";
+         //case OtaAgentEventStartSelfTest:
+         //   return "OtaAgentEventStartSelfTest";
+         case OtaAgentEventRequestJobDocument:
+            return "OtaAgentEventRequestJobDocument";
+         case OtaAgentEventReceivedJobDocument:
+            return "OtaAgentEventReceivedJobDocument";
+         case OtaAgentEventCreateFile:
+            return "OtaAgentEventCreateFile";
+         case OtaAgentEventRequestFileBlock:
+            return "OtaAgentEventRequestFileBlock";
+         case OtaAgentEventReceivedFileBlock:
+            return "OtaAgentEventReceivedFileBlock";
+         case OtaAgentEventActivateImage:
+            return "OtaAgentEventActivateImage";
+         case OtaAgentEventCloseFile:
+            return "OtaAgentEventCloseFile";
+         case OtaAgentEventSuspend:
+            return "OtaAgentEventSuspend";
+         case OtaAgentEventResume:
+            return "OtaAgentEventResume";
+         case OtaAgentEventUserAbort:
+            return "OtaAgentEventUserAbort";
+        case OtaAgentEventShutdown:
+            return "OtaAgentEventShutdown";
+         case OtaAgentEventMax:
+            return "OtaAgentEventMax";
+         default:
+            return "Unknown event";
+    }
+}
+
 static void prvCommandCallback( MQTTAgentCommandContext_t * pCommandContext,
                                 MQTTAgentReturnInfo_t * pxReturnInfo )
 {
@@ -416,6 +453,11 @@ static OtaMqttStatus_t prvMQTTSubscribe( const char * pTopicFilter,
     configASSERT( pTopicFilter != NULL );
     configASSERT( topicFilterLength > 0 );
 
+    if( pTopicFilter != NULL){
+       ESP_LOGI( TAG, "SUSCRPCION a TOPIC: %s",pTopicFilter); 
+    }
+
+
     xSubscribeInfo.pTopicFilter = pTopicFilter;
     xSubscribeInfo.topicFilterLength = topicFilterLength;
     xSubscribeInfo.qos = ucQoS;
@@ -433,6 +475,7 @@ static OtaMqttStatus_t prvMQTTSubscribe( const char * pTopicFilter,
     mqttStatus = MQTTAgent_Subscribe( &xGlobalMqttAgentContext,
                                       &xSubscribeArgs,
                                       &xCommandParams );
+
 
     /* Wait for command to complete so MQTTSubscribeInfo_t remains in scope for the
      * duration of the command. */
@@ -499,6 +542,7 @@ static OtaMqttStatus_t prvMQTTPublish( const char * const pacTopic,
                                     &publishInfo,
                                     &xCommandParams );
 
+
     /* Wait for command to complete so MQTTSubscribeInfo_t remains in scope for the
      * duration of the command. */
     if( mqttStatus == MQTTSuccess )
@@ -527,6 +571,8 @@ static OtaMqttStatus_t prvMQTTPublish( const char * const pacTopic,
         ESP_LOGI( TAG, "Sent PUBLISH packet to broker %.*s to broker.\n\n",
                   topicLen,
                   pacTopic );
+
+        ESP_LOGI( TAG, "Payload: %.*s\n\n", (int)msgSize, pMsg);         
 
         otaRet = OtaMqttSuccess;
     }
@@ -642,6 +688,7 @@ static void requestJobDocumentHandler( void )
 
         if( messageLength > 0 )
         {
+            ESP_LOGI( TAG, " requestJobDocumentHandler. Topic: %s ", topicBuffer );
             prvMQTTPublish( topicBuffer,
                             topicLength,
                             messageBuffer,
@@ -976,8 +1023,18 @@ bool otaDemo_handleIncomingMQTTMessage( char * topic,
      */
     bool handled = mqttDownloader_isDataBlockReceived( &mqttFileDownloaderContext, topic, topicLength );
 
+    ESP_LOGI( TAG, "otaDemo_handleIncomingMQTTMessage \n");
+    
+    if( topic != NULL){
+      ESP_LOGI( TAG, "TOPIC: %s\n", topic);  
+    }
+
+
     if( handled )
     {
+        ESP_LOGI(TAG, "Bloque MQTT recibido en topic: %.*s", (int)topicLength, topic);
+        ESP_LOG_BUFFER_HEXDUMP(TAG, message, messageLength, ESP_LOG_INFO);
+        
         nextEvent.eventId = OtaAgentEventReceivedFileBlock;
         OtaDataEvent_t * dataBuf = getOtaDataEventBuffer();
         memcpy( dataBuf->data, message, messageLength );
@@ -1078,6 +1135,61 @@ static void processOTAEvents( void )
     OtaReceiveEvent_FreeRTOS( &recvEvent );
     recvEventId = recvEvent.eventId;
 
+    
+    switch( recvEventId )
+    {
+        case OtaAgentEventStart:
+            ESP_LOGI( TAG, "recvEventId: OtaAgentEventStart\n" );
+            break;
+
+        case OtaAgentEventRequestJobDocument:
+            ESP_LOGI( TAG, "recvEventId: OtaAgentEventRequestJobDocument\n" );
+            break;
+
+        case OtaAgentEventReceivedJobDocument:
+            ESP_LOGI( TAG, "recvEventId: OtaAgentEventReceivedJobDocument\n" );
+            break;
+
+        case OtaAgentEventCreateFile:
+            ESP_LOGI( TAG, "recvEventId: OtaAgentEventCreateFile\n" );
+            break;
+
+        case OtaAgentEventRequestFileBlock:
+            ESP_LOGI( TAG, "recvEventId: OtaAgentEventRequestFileBlock\n" );
+            break;
+
+        case OtaAgentEventReceivedFileBlock:
+            ESP_LOGI( TAG, "recvEventId: OtaAgentEventReceivedFileBlock\n" );
+            break;
+
+        case OtaAgentEventCloseFile:
+            ESP_LOGI( TAG, "recvEventId: OtaAgentEventCloseFile\n" );
+            break;
+
+        case OtaAgentEventActivateImage:
+            ESP_LOGI( TAG, "recvEventId: OtaAgentEventActivateImage\n" );
+            break;
+
+        case OtaAgentEventShutdown:
+            ESP_LOGI( TAG, "recvEventId: OtaAgentEventShutdown\n" );
+            break;
+
+        case OtaAgentEventSuspend:
+            ESP_LOGI( TAG, "recvEventId: OtaAgentEventSuspend\n" );
+            break;
+
+        case OtaAgentEventResume:
+            ESP_LOGI( TAG, "recvEventId: OtaAgentEventResume\n" );
+            break;
+
+        default:
+            ESP_LOGI( TAG, "recvEventId: UNKNOWN (%d)\n", recvEventId );
+            break;
+    }
+    
+    
+    ESP_LOGI(TAG, "recvEventId: %d", recvEventId );
+
     if( ( recvEventId != OtaAgentEventSuspend ) && ( recvEventId != OtaAgentEventResume ) )
     {
         lastRecvEventIdBeforeSuspend = recvEventId;
@@ -1116,6 +1228,11 @@ static void processOTAEvents( void )
         case OtaAgentEventReceivedJobDocument:
             ESP_LOGI( TAG, "Received Job Document event Received \n" );
 
+            ESP_LOGI( TAG, "Job Document Received (length=%d):\n%.*s\n",
+                recvEvent.jobEvent->jobDataLength,
+                recvEvent.jobEvent->jobDataLength,
+                recvEvent.jobEvent->jobData );    
+
             if( otaAgentState == OtaAgentStateSuspended )
             {
                 ESP_LOGI( TAG, "OTA-Agent is in Suspend State. Hence dropping Job Document. \n" );
@@ -1134,10 +1251,20 @@ static void processOTAEvents( void )
                     case OtaPalJobDocFileCreateFailed:
                     case OtaPalNewImageBootFailed:
                     case OtaPalJobDocProcessingStateInvalid:
-                        ESP_LOGI( TAG, "This is not an OTA job \n" );
+                        if(receivedJobDocumentHandler( recvEvent.jobEvent )  == OtaPalJobDocFileCreateFailed ){
+                            ESP_LOGI( TAG, "receivedJobDocumentHandler( recvEvent.jobEvent )  = OtaPalJobDocFileCreateFailed  \n" );
+                        }
+                        if(receivedJobDocumentHandler( recvEvent.jobEvent )  == OtaPalNewImageBootFailed ){
+                            ESP_LOGI( TAG, "receivedJobDocumentHandler( recvEvent.jobEvent )  = OtaPalNewImageBootFailed  \n" );
+                        }
+                        if(receivedJobDocumentHandler( recvEvent.jobEvent )  == OtaPalJobDocProcessingStateInvalid ){
+                            ESP_LOGI( TAG, "receivedJobDocumentHandler( recvEvent.jobEvent )  = OtaPalJobDocProcessingStateInvalid  \n" );
+                        }
+                            ESP_LOGI( TAG, "This is not an OTA job \n" );
                         break;
 
                     case OtaPalNewImageBooted:
+                        ESP_LOGI( TAG, "receivedJobDocumentHandler( recvEvent.jobEvent ) = OtaPalNewImageBooted \n" );
                         ( void ) sendSuccessMessage();
 
                         /* Short delay before restarting the loop. This allows IoT core
@@ -1515,6 +1642,18 @@ bool vOTAProcessMessage( void * pvIncomingPublishCallbackContext,
                                                   pxPublishInfo->pTopicName,
                                                   pxPublishInfo->topicNameLength );
 
+    ESP_LOGI( TAG, "vOTAProcessMessage" );
+    ESP_LOGI( TAG, "FROM TOPIC: %.*s",
+          pxPublishInfo->topicNameLength,
+          pxPublishInfo->pTopicName );
+    
+    ESP_LOGI( TAG, "MENSAJE: %.*s",
+          pxPublishInfo->payloadLength,
+          (const char *) pxPublishInfo->pPayload );            
+
+    //ESP_LOG_BUFFER_HEXDUMP(TAG, pxPublishInfo->pPayload, 
+    //                   pxPublishInfo->payloadLength, ESP_LOG_INFO);
+
     if( handled == MQTTFileDownloaderSuccess )
     {
         OtaDataEvent_t * dataBuf = getOtaDataEventBuffer();
@@ -1526,6 +1665,8 @@ bool vOTAProcessMessage( void * pvIncomingPublishCallbackContext,
             nextEvent.eventId = OtaAgentEventReceivedFileBlock;
 
             dataBuf->dataLength = pxPublishInfo->payloadLength;
+            
+            ESP_LOGI( TAG, "nextEvent.eventId: %s", getAgentEventString(nextEvent.eventId) );
 
             if( OtaSendEvent_FreeRTOS( &nextEvent ) != OtaOsSuccess )
             {
@@ -1555,11 +1696,12 @@ bool vOTAProcessMessage( void * pvIncomingPublishCallbackContext,
         if( isMatch )
         {
             memcpy( jobDocBuffer.jobData, pxPublishInfo->pPayload, pxPublishInfo->payloadLength );
+
             nextEvent.jobEvent = &jobDocBuffer;
             nextEvent.eventId = OtaAgentEventReceivedJobDocument;
 
             jobDocBuffer.jobDataLength = pxPublishInfo->payloadLength;
-
+            ESP_LOGI( TAG, "nextEvent.eventId: %s", getAgentEventString(nextEvent.eventId) );
             if( OtaSendEvent_FreeRTOS( &nextEvent ) != OtaOsSuccess )
             {
                 ESP_LOGI( TAG, "Failed to send message to OTA task." );
@@ -1578,11 +1720,15 @@ bool vOTAProcessMessage( void * pvIncomingPublishCallbackContext,
         if( isMatch == true )
         {
             memcpy( jobDocBuffer.jobData, pxPublishInfo->pPayload, pxPublishInfo->payloadLength );
+
+            //ESP_LOGI(TAG, "TOPIC: %.*s", pxPublishInfo->topicNameLength, (const char *) pxPublishInfo->pTopicName);
+            //ESP_LOGI(TAG, "Mensaje en start-next/accepted: %.*s", pxPublishInfo->payloadLength, (const char *) pxPublishInfo->pPayload);
+
             nextEvent.jobEvent = &jobDocBuffer;
             nextEvent.eventId = OtaAgentEventReceivedJobDocument;
 
             jobDocBuffer.jobDataLength = pxPublishInfo->payloadLength;
-
+            ESP_LOGI( TAG, "nextEvent.eventId: %s", getAgentEventString(nextEvent.eventId) );
             if( OtaSendEvent_FreeRTOS( &nextEvent ) != OtaOsSuccess )
             {
                 ESP_LOGI( TAG, "Failed to send message to OTA task." );

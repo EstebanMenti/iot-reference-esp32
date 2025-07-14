@@ -1,3 +1,12 @@
 {
-    "idf.adapterTargetName": "esp32c3"
+    "idf.adapterTargetName": "esp32c3",
+    "idf.espIdfPathWin": "C:\\Users\\Esteban\\esp\\v5.0.8\\esp-idf",
+    "idf.toolsPathWin": "C:\\Users\\Esteban\\.espressif",
+    "idf.pythonInstallPath": "C:\\Users\\Esteban\\.espressif\\tools\\idf-python\\3.11.2\\python.exe",
+    "idf.portWin": "COM8",
+    "idf.openOcdConfigs": [
+        "interface/ftdi/esp32_devkitj_v1.cfg",
+        "target/esp32s3.cfg"
+    ],
+    "idf.flashType": "UART"
 }

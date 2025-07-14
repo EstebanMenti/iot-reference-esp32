@@ -1,0 +1,20 @@
+python managed_components/espressif__esp_secure_cert_mgr/tools/configure_esp_secure_cert.py -p PORT --keep_ds_data_on_host --ca-cert CA_CERT_FILEPATH --device-cert DEVICE_CERT_FILEPATH --private-key PRIVATE_KEY_FILEPATH --target_chip CHIP_TYPE --secure_cert_type cust_flash --priv_key_algo KEY_ALG_INFO
+
+
+
+
+
+python managed_components/espressif__esp_secure_cert_mgr/tools/configure_esp_secure_cert.py 
+	-p COM8 
+	--keep_ds_data_on_host 
+	--ca-cert "C:\Users\Esteban\Documents\GitHub\iot-reference-esp32\Certificados AWS\AmazonRootCA1.pem" 
+	--device-cert "C:\Users\Esteban\Documents\GitHub\iot-reference-esp32\Certificados AWS\3bdd3996e178817be7dac9404b8e0df16e996641f12291c2d30332f630365bd9-certificate.pem.crt" 
+	--private-key "C:\Users\Esteban\Documents\GitHub\iot-reference-esp32\Certificados AWS\3bdd3996e178817be7dac9404b8e0df16e996641f12291c2d30332f630365bd9-private.pem.key" 
+	--target_chip esp32 
+	--secure_cert_type cust_flash 
+	--priv_key_algo RSA 2048
+
+
+
+
+python managed_components/espressif__esp_secure_cert_mgr/tools/configure_esp_secure_cert.py -p COM8 --keep_ds_data_on_host --ca-cert "C:\Users\Esteban\Documents\GitHub\iot-reference-esp32\Certificados AWS\AmazonRootCA1.pem" --device-cert "C:\Users\Esteban\Documents\GitHub\iot-reference-esp32\Certificados AWS\3bdd3996e178817be7dac9404b8e0df16e996641f12291c2d30332f630365bd9-certificate.pem.crt" --private-key "C:\Users\Esteban\Documents\GitHub\iot-reference-esp32\Certificados AWS\3bdd3996e178817be7dac9404b8e0df16e996641f12291c2d30332f630365bd9-private.pem.key" --target_chip esp32 --secure_cert_type cust_flash --priv_key_algo RSA 2048

@@ -248,11 +248,11 @@ static void prvStartEnabledDemos( void )
 
     #if ( CONFIG_GRI_RUN_QUALIFICATION_TEST == 0 )
         #if CONFIG_GRI_ENABLE_SUB_PUB_UNSUB_DEMO
-            vStartSubscribePublishUnsubscribeDemo();
+            //vStartSubscribePublishUnsubscribeDemo();
         #endif /* CONFIG_GRI_ENABLE_SIMPLE_PUB_SUB_DEMO */
 
         #if CONFIG_GRI_ENABLE_TEMPERATURE_PUB_SUB_AND_LED_CONTROL_DEMO
-            vStartTempSubPubAndLEDControlDemo();
+            //vStartTempSubPubAndLEDControlDemo();
         #endif /* CONFIG_GRI_ENABLE_TEMPERATURE_LED_PUB_SUB_DEMO */
 
         #if CONFIG_GRI_ENABLE_OTA_DEMO
@@ -359,3 +359,17 @@ void app_main( void )
     app_wifi_init();
     app_wifi_start( POP_TYPE_MAC );
 }
+
+
+/*
+
+Topic donde AWS informa si tiene un trabajo pendiente:   $aws/things/OTA_OBJETO/jobs/start-next/accepted
+
+    Dominio: a1clodcvn91rqa-ats.iot.us-east-2.amazonaws.com
+
+    Politicas adjunta al dominio: POLITICA_OTA
+
+    {
+        "CertificateArn": "arn:aws:acm:us-east-2:941777987983:certificate/ac4bf41b-4127-4207-970b-5acb9813c86c"
+    }
+*/
